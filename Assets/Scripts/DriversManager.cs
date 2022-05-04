@@ -31,7 +31,7 @@ public class DriversManager : MonoBehaviour
         poolController = transform.root.GetComponent<PoolController>();
     }
 
-
+    // Collapse the structure along the width
     public bool Shrink()
     {
         if (PoolController.currentWidth < 2)

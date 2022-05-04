@@ -1,22 +1,30 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 using System.Collections;
 
 public class Follower : MonoBehaviour
 {
+    private MaterialPropertyBlock mPropertyBlock;
+    private Renderer renderer;
+    private int colorPropertyId;
+    public static int gradientLength = 40;
+    internal int gradientColorIndex = 0;
+
+
     internal PoolController poolController;
-    [SerializeField]
-    // Gameobject to following
-    internal GameObject head;
-    // Is this object currently following head
-    internal bool isFollowing = true;
-    // Const offset between balls
-    internal float delta = DriveController.forwardSpeed;
+    internal GameObject head;   // Gameobject to following
+    internal Rigidbody rigidBody;
+    internal bool isFollowing = true;   // Is this object currently following head
+    static float spreadMultipler = 100;
+    internal bool isGoingThrough;
 
     private void Awake()
     {
         poolController = GameObject.Find("Controller").GetComponent<PoolController>();
+        rigidBody = GetComponent<Rigidbody>();
+        renderer = GetComponent<Renderer>();
+        colorPropertyId = Shader.PropertyToID("_Color");
+        mPropertyBlock = new MaterialPropertyBlock();
     }
 
     // Hide object and make ready to use again
@@ -36,13 +44,51 @@ public class Follower : MonoBehaviour
     //  Calling from update every frame
     public void FollowHead()
     {
-        transform.position = Vector3.Lerp(transform.position, head.transform.position, delta * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, head.transform.position, 20 * Time.deltaTime);
     }
 
     public void GoThrough()
     {
         // move the head object forward at a constant rate
-        transform.Translate(Vector3.forward * DriveController.forwardSpeed/2 * Time.deltaTime);
+        rigidBody.MovePosition(transform.position + Vector3.forward * 5 * Time.deltaTime);
+    }
+
+    public Vector3 GetRandomLimitedDirection(float multipler)
+    {
+        Vector3 vec = new Vector3(
+                Random.Range(-0.4f, 0.4f),
+                Random.Range(0.4f, 1f),
+                Random.Range(1.4f, 1.7f)) * multipler;
+        return vec;
+    }
+
+    public void SetColor(int index, Color color1, Color color2)
+    {
+        index %= gradientLength;
+        renderer.GetPropertyBlock(mPropertyBlock);
+        mPropertyBlock.SetColor(colorPropertyId, Color.Lerp(color1, color2, (float)index / gradientLength));
+        renderer.SetPropertyBlock(mPropertyBlock);
+        gradientColorIndex = index;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Finish"))
+        {
+            isFollowing = false;
+            GetComponent<Rigidbody>().AddForce(GetRandomLimitedDirection(spreadMultipler), ForceMode.Impulse);
+            StartCoroutine(GoThroughDelayed());
+        }
+        if(other.CompareTag("Multipler"))
+        {
+            isGoingThrough = false;
+        }
+    }
+
+    IEnumerator GoThroughDelayed()
+    {
+        yield return new WaitForSeconds(1f);
+        isGoingThrough = true;
     }
 
     // Update is called once per frame
@@ -53,6 +99,10 @@ public class Follower : MonoBehaviour
             if (isFollowing)
             {
                 FollowHead();
+            }
+            else if (isGoingThrough)
+            {
+                GoThrough();
             }
         }
 

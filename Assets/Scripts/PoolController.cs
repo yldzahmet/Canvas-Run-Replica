@@ -7,11 +7,15 @@ public class PoolController : MonoBehaviour
 {
     DriversManager driversManager;
     public static int driverCount = 9;
-    internal static int currentWidth = 5;
-    internal static int currentHeight = 20;
-    public int maxHeight = 60;
+    internal static int currentWidth = 9; // Edit this value if need to change start column number !!
+    internal static int currentHeight = 20; //Edit this value if need to change start row number !!
+    public static int maxHeight = 100;
     public GameObject pooledObjectsParent; // parent object for pooled deactives
     public GameObject ball; // ball prefab
+    public enum AdditionType {Column, Row};
+    public AdditionType additionType;
+
+    public Color color1, color2;
 
     public List<GameObject> drivers;    // List for holding driver objects
     [SerializeField]
@@ -29,9 +33,6 @@ public class PoolController : MonoBehaviour
     {
         obj.transform.SetParent(pooledObjectsParent.transform);
     }
-
-    public enum AdditionType {Column, Row};
-    public AdditionType additionType;
 
     // Expands the structure along height by addition parameter
     public void ExpandHeight(int addition)
@@ -183,22 +184,21 @@ public class PoolController : MonoBehaviour
     {
         int startIndex = 0;
         int count = height;
+        int gradientColorIndex = 0;
 
         GameObject headObject;
         List<GameObject> temp = new List<GameObject>();
 
         if(type == AdditionType.Row)
         {
+            headObject = lastBalls[headIndex];
             startIndex = height;
             desiredAddition = desiredAddition > maxHeight - height ? maxHeight - height : desiredAddition;
             count += desiredAddition;
 
-            headObject = lastBalls[headIndex];
         }
         else // AdditionType.Column
-        {
             headObject = drivers[headIndex];
-        }
 
         for (int i = startIndex ; i < count ; i++)
         {
@@ -206,35 +206,46 @@ public class PoolController : MonoBehaviour
             if (!current) return;
 
             temp.Add(current);
+            Follower follower = current.GetComponent<Follower>();
 
             if(temp.IndexOf(current) == 0)  // if current is first ball that is following Driver
             {
-                current.GetComponent<Follower>().head = headObject;
+                follower.head = headObject;
 
                 if (type == AdditionType.Column)
-                {
+                {   // first ball of column 
                     headObject.GetComponent<DriversManager>().headFollower = current;
                     headObject.GetComponent<DriversManager>().isPullingBall = true;
+                    gradientColorIndex = 0;
+                }
+                else
+                {
+                    Follower _follower = lastBalls[headIndex].GetComponent<Follower>();
+                    gradientColorIndex = _follower.gradientColorIndex - 1; // get last gradient index
                 }
                 // No need to set headFollower for this object if AdditionType is Row. Because they appear behind existing one.
             }
+            // Second and other sequence
             // Set head for each object. Every ball has to be head of previous one.
-            else
+            else 
             {
-                current.GetComponent<Follower>().head = temp[ temp.IndexOf(current) -1 ];
+                follower.head = temp[ temp.IndexOf(current) -1 ];
+                gradientColorIndex += 1; 
             }
 
             // Set properties for reactivating in scene
-            current.GetComponent<Follower>().isFollowing = true;
             current.transform.SetParent(null);
-            current.transform.position = current.GetComponent<Follower>().head.transform.position + new Vector3(0, 0, -0.7f);
+            follower.isFollowing = true;
+            current.transform.position = follower.head.transform.position + new Vector3(0, 0, -0.7f);
+            follower.SetColor(  // continue to gradient pattern where last object leave
+                gradientColorIndex, 
+                color1, 
+                color2); 
             current.SetActive(true);
 
             // put the last one in the lastBall list. 
             if (i == count - 1)
-            {
                 lastBalls[headIndex] = current;
-            }
         }
     }
 
@@ -263,6 +274,9 @@ public class PoolController : MonoBehaviour
                 //  Instantiate balls
                 GameObject go = Instantiate(ball, new Vector3( (i - 4) * 0.7f , 1.7f, -j * 0.7f), Quaternion.identity);
 
+                // Set gradient color
+                go.GetComponent<Follower>().SetColor(j, color1, color2);
+
                 // Add ever object to pool
                 poolList.Add(go);
 
@@ -281,15 +295,15 @@ public class PoolController : MonoBehaviour
                 if(j == 19)
                     lastBalls.Add(go);
 
-                //  Hide columns optionaly
+                //  Hide columns optionaly and modify Manager.currentLengt according to column number
                 switch (i)
                 {
-                    case 0:
-                    case 1:
-                    case 7:
-                    case 8:
-                        go.GetComponent<Follower>().ReturnToPool();
-                        break;
+                    //case 0:
+                    //case 1:
+                    //case 7:
+                    //case 8:
+                    //    go.GetComponent<Follower>().ReturnToPool();
+                    //    break;
                 }
                 //  Hide rows after line 20
                 if (j > 19)

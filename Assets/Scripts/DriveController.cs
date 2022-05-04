@@ -4,62 +4,73 @@ using UnityEngine;
 
 public class DriveController : MonoBehaviour
 {
-    [SerializeField]
-    public static float forwardSpeed = 20;
-    public float horizontalSpeed;
-    public float maxRotAngle;
-    private float rotationAngle;
+    public float forwardSpeed = 20;
     private float horizontalInput;
+    public float horizontalSpeed = 20;
+    private float rotationAngle;
+    public float maxRotationAngle;
+    public static float rightBorder;
+
+    internal Rigidbody rigidBody;
 
     private Quaternion steer = Quaternion.identity;
     private Vector3 rotationVector = new Vector3();
     private Vector3 currentPos = new Vector3();
 
+    private void Start()
+    {
+        rigidBody = GetComponent<Rigidbody>();
+    }
+
     public void RotateHead()
     {
-        rotationAngle = Mathf.Lerp(rotationAngle, horizontalInput * maxRotAngle, 60 * Time.deltaTime);
+        rotationAngle = Mathf.Lerp(rotationAngle, horizontalInput * maxRotationAngle, 100 * Time.deltaTime);
         rotationVector.y = rotationAngle;
         steer.eulerAngles = rotationVector;
-
-        // tilt the head based on left/right arrow keys
         transform.rotation = steer;
+    }
+
+    // Arrange position limits of both side of road
+    public float SetBorders(int currentWidth)
+    {
+        return 10.15f - 0.35f * currentWidth;
     }
 
     public void ClampPosition()
     {
-        currentPos = transform.position;
-        if (transform.position.x < -5.0f)
+        rightBorder = SetBorders(PoolController.currentWidth);
+        currentPos = rigidBody.transform.position;
+        if (rigidBody.transform.position.x < -rightBorder)
         {
-            currentPos.x = -5;
-            transform.position = currentPos;
+            currentPos.x = -rightBorder;
+            rigidBody.transform.position = currentPos;
         }
-        else if (transform.position.x > 5.0f)
+        else if (transform.position.x > rightBorder)
         {
-            currentPos.x = 5;
-            transform.position = currentPos;
+            currentPos.x = rightBorder;
+            rigidBody.transform.position = currentPos;
         }
     }
 
     public void DriveBalls()
     {
-        // Get the users horizontal input
+        // Get the users horizontal
         horizontalInput = Input.GetAxis("Horizontal");
-
-        // Move the head object forward at a constant rate
-        transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime);
-
-        // Move the head object left/right at a constant rate
-        transform.Translate(Vector3.right * horizontalSpeed * horizontalInput * Time.deltaTime);
+        Vector3 directionyVector = new Vector3(horizontalInput * horizontalSpeed * Time.deltaTime, 0, forwardSpeed * Time.deltaTime);
+        print("Direction Vector : " + directionyVector);
+        transform.Translate(directionyVector);
     }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        // If pressed play button
+        //If pressed play button
         if (Manager.startDriving)
-        {
             DriveBalls();
-            ClampPosition();
-            RotateHead();
-        }
+    }
+    private void Update()
+    {
+        RotateHead();
+        ClampPosition();
     }
 }
