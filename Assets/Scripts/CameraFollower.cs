@@ -14,7 +14,8 @@ public class CameraFollower : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        offsetVector = transform.position;
+        camPos = transform.position;
+        offsetVector = transform.position - target.transform.position;
     }
 
     // Update is called once per frame
