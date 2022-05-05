@@ -62,15 +62,14 @@ public class DriveController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
-    {
+    void Update()
+    {   
         //If pressed play button
         if (Manager.startDriving)
+        {
+            ClampPosition();
             DriveBalls();
-    }
-    private void Update()
-    {
-        RotateHead();
-        ClampPosition();
+            RotateHead();
+        }
     }
 }

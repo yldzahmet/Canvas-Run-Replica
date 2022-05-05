@@ -21,11 +21,15 @@ public class CameraFollower : MonoBehaviour
     void LateUpdate()
     {
         if (!isFinished)
-            camPos = target.transform.position + offsetVector;
+        {
+            camPos = Vector3.Lerp(camPos,
+                new Vector3(0, target.transform.position.y + offsetVector.y, target.transform.position.z + offsetVector.z),
+                4 * Time.deltaTime);
+        }
         else
         {
             camPos = Vector3.MoveTowards(transform.position, targetPos, 10 * Time.deltaTime);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(camRotX, 0, 0), 10f *Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(camRotX, 0, 0), 10f * Time.deltaTime);
         }
         transform.position = camPos;
     }

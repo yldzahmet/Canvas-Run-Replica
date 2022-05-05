@@ -44,7 +44,7 @@ public class Follower : MonoBehaviour
     //  Calling from update every frame
     public void FollowHead()
     {
-        transform.position = Vector3.Lerp(transform.position, head.transform.position, 20 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, head.transform.position, 25 * Time.deltaTime);
     }
 
     public void GoThrough()
@@ -92,7 +92,7 @@ public class Follower : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {   
         // If pressed play button
         if (Manager.startDriving){
