@@ -12,6 +12,7 @@ public class Follower : MonoBehaviour
 
 
     internal PoolController poolController;
+    internal DriveController driveController;
     internal GameObject head;   // Gameobject to following
     internal Rigidbody rigidBody;
     internal bool isFollowing = true;   // Is this object currently following head
@@ -20,7 +21,9 @@ public class Follower : MonoBehaviour
 
     private void Awake()
     {
-        poolController = GameObject.Find("Controller").GetComponent<PoolController>();
+        GameObject controller = GameObject.Find("Controller");
+        poolController = controller.GetComponent<PoolController>();
+        driveController = controller.GetComponent<DriveController>();
         rigidBody = GetComponent<Rigidbody>();
         renderer = GetComponent<Renderer>();
         colorPropertyId = Shader.PropertyToID("_Color");
@@ -44,13 +47,13 @@ public class Follower : MonoBehaviour
     //  Calling from update every frame
     public void FollowHead()
     {
-        transform.position = Vector3.Lerp(transform.position, head.transform.position, 25 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, head.transform.position, driveController.forwardSpeed * Time.deltaTime);
     }
 
     public void GoThrough()
     {
         // move the head object forward at a constant rate
-        rigidBody.MovePosition(transform.position + Vector3.forward * 5 * Time.deltaTime);
+        rigidBody.MovePosition(transform.position + Vector3.forward * 20 * Time.deltaTime);
     }
 
     public Vector3 GetRandomLimitedDirection(float multipler)

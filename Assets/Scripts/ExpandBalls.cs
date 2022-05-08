@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,8 +23,8 @@ public class ExpandBalls : MonoBehaviour
 
     public int GenerateNumber()
     {
-        int number = 0;
-        if(name == Width)
+        int number;
+        if (name == Width)
         {
             do
             {

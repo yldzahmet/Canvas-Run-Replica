@@ -2424,8 +2424,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02cbc8a13a3058c4b9682e2ba382b781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardSpeed: 20
-  horizontalSpeed: 30
+  forwardSpeed: 25
+  horizontalSpeed: 40
   maxRotationAngle: 30
 --- !u!4 &193690032
 Transform:
