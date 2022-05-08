@@ -30,7 +30,7 @@ public class CameraFollower : MonoBehaviour
         else
         {
             camPos = Vector3.MoveTowards(transform.position, targetPos, 10 * Time.deltaTime);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(camRotX, 0, 0), 10f * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(camRotX, 0, 0), 5f * Time.deltaTime);
         }
         transform.position = camPos;
     }

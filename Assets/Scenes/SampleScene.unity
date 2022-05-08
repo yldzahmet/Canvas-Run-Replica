@@ -2425,7 +2425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardSpeed: 25
-  horizontalSpeed: 40
+  horizontalSpeed: 30
   maxRotationAngle: 30
 --- !u!4 &193690032
 Transform:

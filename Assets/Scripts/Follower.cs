@@ -53,7 +53,7 @@ public class Follower : MonoBehaviour
     public void GoThrough()
     {
         // move the head object forward at a constant rate
-        rigidBody.MovePosition(transform.position + Vector3.forward * 20 * Time.deltaTime);
+        rigidBody.MovePosition(transform.position + Vector3.forward * 30 * Time.deltaTime);
     }
 
     public Vector3 GetRandomLimitedDirection(float multipler)
