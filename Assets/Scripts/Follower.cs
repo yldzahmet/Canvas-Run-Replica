@@ -79,6 +79,7 @@ public class Follower : MonoBehaviour
         if (other.CompareTag("Finish"))
         {
             isFollowing = false;
+            CameraFollower.isFinished = true;
             GetComponent<Rigidbody>().AddForce(GetRandomLimitedDirection(spreadMultipler), ForceMode.Impulse);
             StartCoroutine(GoThroughDelayed());
         }

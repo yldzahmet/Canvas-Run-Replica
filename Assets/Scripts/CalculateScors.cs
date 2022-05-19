@@ -11,7 +11,6 @@ public class CalculateScors : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Manager.score += multipler;
-            CameraFollower.isFinished = true;
         }
     }
 }
